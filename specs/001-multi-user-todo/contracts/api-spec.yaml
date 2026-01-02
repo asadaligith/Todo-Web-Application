@@ -1,0 +1,522 @@
+openapi: 3.1.0
+info:
+  title: Multi-User Todo API
+  description: RESTful API for multi-user todo application with JWT authentication
+  version: 1.0.0
+  contact:
+    name: API Support
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+  - url: https://api.yourdomain.com/api/v1
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User registration and login endpoints
+  - name: Tasks
+    description: Task CRUD operations (requires authentication)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login
+
+  schemas:
+    # ==================== Request Schemas ====================
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: user@example.com
+          description: User's email address (must be unique)
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+          example: SecurePass123
+          description: Password (min 8 chars, must contain letters and numbers)
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: SecurePass123
+
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: Buy groceries
+          description: Task title (required, max 200 characters)
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+          example: Milk, eggs, bread, and vegetables
+          description: Task description (optional, max 2000 characters)
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: Buy groceries and cook dinner
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+          example: Updated task description
+        isCompleted:
+          type: boolean
+          example: true
+          description: Mark task as completed or incomplete
+      description: All fields are optional; only provided fields will be updated
+
+    # ==================== Response Schemas ====================
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - email
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-01-03T10:30:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-01-03T10:30:00Z
+      description: User information (password never included)
+
+    AuthResponse:
+      type: object
+      required:
+        - accessToken
+        - tokenType
+        - expiresIn
+        - user
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          description: JWT access token
+        tokenType:
+          type: string
+          example: Bearer
+          description: Token type (always "Bearer")
+        expiresIn:
+          type: integer
+          example: 86400
+          description: Token expiration time in seconds (24 hours = 86400)
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    TaskResponse:
+      type: object
+      required:
+        - id
+        - userId
+        - title
+        - description
+        - isCompleted
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 660e8400-e29b-41d4-a716-446655440001
+        userId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+          description: ID of the user who owns this task
+        title:
+          type: string
+          example: Buy groceries
+        description:
+          type: string
+          nullable: true
+          example: Milk, eggs, bread, and vegetables
+        isCompleted:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-01-03T10:35:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-01-03T10:35:00Z
+
+    TaskListResponse:
+      type: object
+      required:
+        - tasks
+        - total
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskResponse'
+        total:
+          type: integer
+          example: 42
+          description: Total number of tasks for the authenticated user
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: ValidationError
+          description: Error type/code
+        message:
+          type: string
+          example: Invalid input data
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details (e.g., field-level validation errors)
+          example:
+            title: "Title is required"
+            email: "Invalid email format"
+
+    SuccessResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Operation completed successfully
+
+paths:
+  # ==================== Authentication Endpoints ====================
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user account
+      description: Create a new user account with email and password
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error (invalid email, weak password, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: ValidationError
+                message: Invalid input data
+                details:
+                  password: "Password must be at least 8 characters and contain letters and numbers"
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: ConflictError
+                message: An account with this email already exists
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login to existing account
+      description: Authenticate user and receive JWT access token
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: AuthenticationError
+                message: Invalid email or password
+
+  # ==================== Task Endpoints ====================
+
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Get all tasks for authenticated user
+      description: Retrieve a list of all tasks owned by the authenticated user
+      operationId: getTasks
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+        '401':
+          description: Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: AuthenticationError
+                message: Invalid or expired token
+
+    post:
+      tags:
+        - Tasks
+      summary: Create a new task
+      description: Create a new task for the authenticated user
+      operationId: createTask
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          description: Validation error (empty title, exceeds max length, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: ValidationError
+                message: Invalid input data
+                details:
+                  title: "Title is required and must not be empty"
+        '401':
+          description: Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Get a specific task
+      description: Retrieve a single task by ID (only if owned by authenticated user)
+      operationId: getTask
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: UUID of the task to retrieve
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '401':
+          description: Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Task belongs to another user (forbidden)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: ForbiddenError
+                message: You do not have permission to access this task
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: NotFoundError
+                message: Task not found
+
+    put:
+      tags:
+        - Tasks
+      summary: Update a task
+      description: Update title, description, or completion status of a task (only if owned by authenticated user)
+      operationId: updateTask
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: UUID of the task to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Task belongs to another user (forbidden)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a task
+      description: Permanently delete a task (only if owned by authenticated user)
+      operationId: deleteTask
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: UUID of the task to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Task deleted successfully (no content returned)
+        '401':
+          description: Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Task belongs to another user (forbidden)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+security:
+  - BearerAuth: []
