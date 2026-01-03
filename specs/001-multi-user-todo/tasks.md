@@ -22,16 +22,16 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create root-level project structure (backend/, frontend/, shared/ directories)
-- [ ] T002 [P] Initialize backend Python project with requirements.txt and .env.example
-- [ ] T003 [P] Initialize frontend Next.js project with package.json and .env.local.example
-- [ ] T004 [P] Create backend/src/ directory structure (models/, services/, api/routes/, middleware/, core/)
-- [ ] T005 [P] Create frontend directory structure (app/, components/, lib/, types/)
-- [ ] T006 [P] Configure Python virtual environment and install FastAPI dependencies in backend/
-- [ ] T007 [P] Install Next.js dependencies and configure TypeScript in frontend/
-- [ ] T008 [P] Configure Tailwind CSS in frontend/tailwind.config.ts and frontend/app/globals.css
-- [ ] T009 [P] Create .gitignore for root, backend/, and frontend/ directories
-- [ ] T010 Create root README.md with project overview and setup instructions
+- [X] T001 Create root-level project structure (backend/, frontend/, shared/ directories)
+- [X] T002 [P] Initialize backend Python project with requirements.txt and .env.example
+- [X] T003 [P] Initialize frontend Next.js project with package.json and .env.local.example
+- [X] T004 [P] Create backend/src/ directory structure (models/, services/, api/routes/, middleware/, core/)
+- [X] T005 [P] Create frontend directory structure (app/, components/, lib/, types/)
+- [X] T006 [P] Configure Python virtual environment and install FastAPI dependencies in backend/
+- [X] T007 [P] Install Next.js dependencies and configure TypeScript in frontend/
+- [X] T008 [P] Configure Tailwind CSS in frontend/tailwind.config.ts and frontend/app/globals.css
+- [X] T009 [P] Create .gitignore for root, backend/, and frontend/ directories
+- [X] T010 Create root README.md with project overview and setup instructions
 
 ---
 
@@ -41,22 +41,22 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T011 Configure environment variables in backend/.env for DATABASE_URL, JWT_SECRET, CORS_ORIGINS
-- [ ] T012 Configure environment variables in frontend/.env.local for NEXT_PUBLIC_API_URL, BETTER_AUTH_SECRET
-- [ ] T013 Create backend/src/core/config.py to load settings from environment variables using Pydantic BaseSettings
-- [ ] T014 Create backend/src/core/database.py for Neon PostgreSQL connection and SQLModel session management
-- [ ] T015 Create backend/src/core/security.py with password hashing utilities (bcrypt) and JWT token creation/verification functions
-- [ ] T016 Initialize Alembic in backend/alembic/ for database migrations
-- [ ] T017 Create initial Alembic migration (001_initial_schema.py) for users and tasks tables per data-model.md
+- [X] T011 Configure environment variables in backend/.env for DATABASE_URL, JWT_SECRET, CORS_ORIGINS
+- [X] T012 Configure environment variables in frontend/.env.local for NEXT_PUBLIC_API_URL, BETTER_AUTH_SECRET
+- [X] T013 Create backend/src/core/config.py to load settings from environment variables using Pydantic BaseSettings
+- [X] T014 Create backend/src/core/database.py for Neon PostgreSQL connection and SQLModel session management
+- [X] T015 Create backend/src/core/security.py with password hashing utilities (bcrypt) and JWT token creation/verification functions
+- [X] T016 Initialize Alembic in backend/alembic/ for database migrations
+- [X] T017 Create initial Alembic migration (001_initial_schema.py) for users and tasks tables per data-model.md
 - [ ] T018 Apply Alembic migration to create database schema in Neon PostgreSQL
-- [ ] T019 Create backend/src/middleware/error_handler.py for global exception handling with consistent error response format
-- [ ] T020 Create backend/src/middleware/auth_middleware.py for JWT token validation and user extraction from claims
-- [ ] T021 Create backend/src/api/dependencies.py for dependency injection (get_db session, get_current_user)
-- [ ] T022 Create backend/src/main.py FastAPI application with CORS middleware configured for frontend origin
-- [ ] T023 [P] Configure Better Auth in frontend/lib/auth/config.ts with JWT secret matching backend
-- [ ] T024 [P] Create frontend/app/api/auth/[...all]/route.ts for Better Auth API handler
-- [ ] T025 [P] Create frontend/lib/services/api-client.ts base HTTP client with automatic JWT token attachment from Better Auth
-- [ ] T026 [P] Create frontend/types/user.ts and frontend/types/task.ts TypeScript type definitions matching API contracts
+- [X] T019 Create backend/src/middleware/error_handler.py for global exception handling with consistent error response format
+- [X] T020 Create backend/src/middleware/auth_middleware.py for JWT token validation and user extraction from claims
+- [X] T021 Create backend/src/api/dependencies.py for dependency injection (get_db session, get_current_user)
+- [X] T022 Create backend/src/main.py FastAPI application with CORS middleware configured for frontend origin
+- [X] T023 [P] Configure Better Auth in frontend/lib/auth/config.ts with JWT secret matching backend
+- [X] T024 [P] Create frontend/app/api/auth/[...all]/route.ts for Better Auth API handler
+- [X] T025 [P] Create frontend/lib/services/api-client.ts base HTTP client with automatic JWT token attachment from Better Auth
+- [X] T026 [P] Create frontend/types/user.ts and frontend/types/task.ts TypeScript type definitions matching API contracts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -70,24 +70,24 @@
 
 ### Implementation for User Story 1
 
-- [ ] T027 [P] [US1] Create backend/src/models/user.py User model with SQLModel (id, email, hashed_password, timestamps)
-- [ ] T028 [P] [US1] Create backend/src/services/auth_service.py with register_user function (hash password, create user record)
-- [ ] T029 [US1] Add login_user function to backend/src/services/auth_service.py (verify password, generate JWT token)
-- [ ] T030 [US1] Create backend/src/api/routes/auth.py with POST /api/v1/auth/register endpoint calling auth_service.register_user
-- [ ] T031 [US1] Add POST /api/v1/auth/login endpoint to backend/src/api/routes/auth.py calling auth_service.login_user
-- [ ] T032 [US1] Register auth router in backend/src/main.py FastAPI app with /api/v1 prefix
-- [ ] T033 [US1] Add email format validation and password strength validation (min 8 chars, letters + numbers) to auth endpoints
-- [ ] T034 [US1] Implement error handling for duplicate email (409 Conflict) and invalid credentials (401 Unauthorized) in auth routes
-- [ ] T035 [P] [US1] Create frontend/components/auth/RegisterForm.tsx with email and password inputs and form validation
-- [ ] T036 [P] [US1] Create frontend/components/auth/LoginForm.tsx with email and password inputs
-- [ ] T037 [P] [US1] Create frontend/app/(auth)/register/page.tsx using RegisterForm component
-- [ ] T038 [P] [US1] Create frontend/app/(auth)/login/page.tsx using LoginForm component
-- [ ] T039 [US1] Create frontend/app/(dashboard)/layout.tsx with authentication check redirecting unauthenticated users to /login
-- [ ] T040 [US1] Create frontend/app/(dashboard)/tasks/page.tsx empty task dashboard with "No tasks yet" empty state
-- [ ] T041 [US1] Implement sign-out functionality in frontend using Better Auth session clearing
-- [ ] T042 [US1] Add session persistence so authenticated users remain logged in after page refresh
-- [ ] T043 [US1] Display validation error messages in RegisterForm for weak passwords and invalid emails
-- [ ] T044 [US1] Display authentication error messages in LoginForm for invalid credentials
+- [X] T027 [P] [US1] Create backend/src/models/user.py User model with SQLModel (id, email, hashed_password, timestamps)
+- [X] T028 [P] [US1] Create backend/src/services/auth_service.py with register_user function (hash password, create user record)
+- [X] T029 [US1] Add login_user function to backend/src/services/auth_service.py (verify password, generate JWT token)
+- [X] T030 [US1] Create backend/src/api/routes/auth.py with POST /api/v1/auth/register endpoint calling auth_service.register_user
+- [X] T031 [US1] Add POST /api/v1/auth/login endpoint to backend/src/api/routes/auth.py calling auth_service.login_user
+- [X] T032 [US1] Register auth router in backend/src/main.py FastAPI app with /api/v1 prefix
+- [X] T033 [US1] Add email format validation and password strength validation (min 8 chars, letters + numbers) to auth endpoints
+- [X] T034 [US1] Implement error handling for duplicate email (409 Conflict) and invalid credentials (401 Unauthorized) in auth routes
+- [X] T035 [P] [US1] Create frontend/components/auth/RegisterForm.tsx with email and password inputs and form validation
+- [X] T036 [P] [US1] Create frontend/components/auth/LoginForm.tsx with email and password inputs
+- [X] T037 [P] [US1] Create frontend/app/(auth)/register/page.tsx using RegisterForm component
+- [X] T038 [P] [US1] Create frontend/app/(auth)/login/page.tsx using LoginForm component
+- [X] T039 [US1] Create frontend/app/(dashboard)/layout.tsx with authentication check redirecting unauthenticated users to /login
+- [X] T040 [US1] Create frontend/app/(dashboard)/tasks/page.tsx empty task dashboard with "No tasks yet" empty state
+- [X] T041 [US1] Implement sign-out functionality in frontend using Better Auth session clearing
+- [X] T042 [US1] Add session persistence so authenticated users remain logged in after page refresh
+- [X] T043 [US1] Display validation error messages in RegisterForm for weak passwords and invalid emails
+- [X] T044 [US1] Display authentication error messages in LoginForm for invalid credentials
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently (register, login, dashboard access, sign out)
 
