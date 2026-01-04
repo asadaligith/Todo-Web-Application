@@ -9,7 +9,12 @@ from .middleware.error_handler import (
     validation_exception_handler,
     database_exception_handler,
     generic_exception_handler,
+    custom_validation_exception_handler,
+    not_found_exception_handler,
+    forbidden_exception_handler,
+    unauthorized_exception_handler,
 )
+from .core.exceptions import ValidationError, NotFoundError, ForbiddenError, UnauthorizedError
 
 
 # Create FastAPI application
@@ -34,6 +39,10 @@ app.add_middleware(
 
 # Register exception handlers
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(ValidationError, custom_validation_exception_handler)
+app.add_exception_handler(NotFoundError, not_found_exception_handler)
+app.add_exception_handler(ForbiddenError, forbidden_exception_handler)
+app.add_exception_handler(UnauthorizedError, unauthorized_exception_handler)
 app.add_exception_handler(SQLAlchemyError, database_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
@@ -68,7 +77,7 @@ async def root():
 
 
 # Import and register routers
-from .api.routes import auth
+from .api.routes import auth, tasks
 
 app.include_router(
     auth.router,
@@ -76,9 +85,11 @@ app.include_router(
     tags=["Authentication"]
 )
 
-# Tasks router will be added in Phase 4
-# from .api.routes import tasks
-# app.include_router(tasks.router, prefix=settings.API_V1_PREFIX, tags=["Tasks"])
+app.include_router(
+    tasks.router,
+    prefix=settings.API_V1_PREFIX,
+    tags=["Tasks"]
+)
 
 
 if __name__ == "__main__":

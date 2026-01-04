@@ -1,9 +1,12 @@
 """User model for authentication and task ownership."""
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 from datetime import datetime
 from uuid import UUID, uuid4
-from typing import Optional
+from typing import Optional, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .task import Task
 
 
 class User(SQLModel, table=True):
@@ -26,7 +29,8 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
     updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
-    # Note: Relationship to tasks will be added in Phase 4
+    # Relationship: One user owns many tasks (cascade delete)
+    tasks: List["Task"] = Relationship(back_populates="owner", cascade_delete=True)
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email})>"

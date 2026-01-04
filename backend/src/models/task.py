@@ -1,9 +1,12 @@
 """Task model for todo items."""
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 from datetime import datetime
 from uuid import UUID, uuid4
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .user import User
 
 
 class Task(SQLModel, table=True):
@@ -30,7 +33,8 @@ class Task(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
-    # Note: Relationship to User will be added in Phase 4 if needed
+    # Relationship: Each task belongs to exactly one user
+    owner: Optional["User"] = Relationship(back_populates="tasks")
 
     def __repr__(self) -> str:
         return f"<Task(id={self.id}, title='{self.title}', completed={self.is_completed})>"

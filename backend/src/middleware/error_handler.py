@@ -6,6 +6,8 @@ from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Union
 
+from ..core.exceptions import ValidationError, NotFoundError, ForbiddenError, UnauthorizedError
+
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """
@@ -45,6 +47,58 @@ async def database_exception_handler(request: Request, exc: SQLAlchemyError) -> 
             "error": "Database Error",
             "message": "An error occurred while processing your request. Please try again later.",
             "detail": str(exc),  # Include error details in development
+        },
+    )
+
+
+async def custom_validation_exception_handler(request: Request, exc: ValidationError) -> JSONResponse:
+    """
+    Handle custom validation errors (400 Bad Request).
+    """
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            "error": "Validation Error",
+            "message": exc.message,
+        },
+    )
+
+
+async def not_found_exception_handler(request: Request, exc: NotFoundError) -> JSONResponse:
+    """
+    Handle resource not found errors (404 Not Found).
+    """
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={
+            "error": "Not Found",
+            "message": exc.message,
+        },
+    )
+
+
+async def forbidden_exception_handler(request: Request, exc: ForbiddenError) -> JSONResponse:
+    """
+    Handle forbidden access errors (403 Forbidden).
+    """
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={
+            "error": "Forbidden",
+            "message": exc.message,
+        },
+    )
+
+
+async def unauthorized_exception_handler(request: Request, exc: UnauthorizedError) -> JSONResponse:
+    """
+    Handle authentication errors (401 Unauthorized).
+    """
+    return JSONResponse(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        content={
+            "error": "Unauthorized",
+            "message": exc.message,
         },
     )
 
