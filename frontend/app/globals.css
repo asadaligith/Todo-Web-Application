@@ -2,37 +2,154 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+@layer base {
+  /* Modern CSS reset and base styles */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  min-height: 100vh;
+  html {
+    @apply scroll-smooth antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+  }
+
+  /* Improved focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Ensure images are responsive by default */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Remove default button styles */
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* Improve form element consistency */
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+  /* Responsive container with fluid typography */
+  .container-responsive {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: clamp(1rem, 5vw, 2rem);
+    padding-right: clamp(1rem, 5vw, 2rem);
   }
 
-  .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+  /* Fluid typography using clamp() */
+  .text-responsive-sm {
+    font-size: clamp(0.875rem, 2vw, 1rem);
   }
 
-  .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  .text-responsive-base {
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
   }
 
-  .card {
-    @apply bg-white rounded-lg shadow-md p-6;
+  .text-responsive-lg {
+    font-size: clamp(1.125rem, 3vw, 1.5rem);
+  }
+
+  .text-responsive-xl {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  .text-responsive-2xl {
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  /* Modern card with responsive padding */
+  .card-responsive {
+    @apply bg-white rounded-lg shadow-sm;
+    padding: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  /* Responsive spacing utilities */
+  .spacing-responsive-sm {
+    gap: clamp(0.5rem, 2vw, 1rem);
+  }
+
+  .spacing-responsive-md {
+    gap: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  .spacing-responsive-lg {
+    gap: clamp(1.5rem, 4vw, 2rem);
+  }
+}
+
+@layer utilities {
+  /* Smooth fade-in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Touch-friendly tap targets (min 44x44px for mobile) */
+  .tap-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Prevent layout shift with aspect ratio */
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+
+  /* Safe area padding for mobile devices */
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Smooth scrolling with better performance */
+  .scroll-smooth-gpu {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;
   }
 }

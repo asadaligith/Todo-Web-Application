@@ -2,7 +2,7 @@
  * Root layout for the application.
  */
 
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -10,7 +10,13 @@ export const metadata: Metadata = {
   description: 'A secure multi-user todo application with task management',
   keywords: ['todo', 'task management', 'productivity'],
   authors: [{ name: 'Todo App Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 }
 
 export default function RootLayout({

@@ -1,5 +1,5 @@
 /**
- * Landing page - redirects to login or shows welcome message.
+ * Landing page - Modern, beautiful, and fully responsive.
  */
 
 'use client'
@@ -21,77 +21,74 @@ export default function HomePage() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <header className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Welcome to Todo App
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-700">
+      <div className="max-w-6xl mx-auto px-4 py-16 sm:py-24">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
+            Todo App
           </h1>
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Organize your life with our simple and secure task management application
+          <p className="text-lg sm:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            Simple, secure task management for everyone
           </p>
-        </header>
 
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <div className="text-primary-600 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Secure</h3>
-            <p className="text-gray-600">
-              Your tasks are protected with JWT authentication and encrypted passwords
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <div className="text-primary-600 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Simple</h3>
-            <p className="text-gray-600">
-              Clean interface designed for productivity without distractions
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <div className="text-primary-600 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Personal</h3>
-            <p className="text-gray-600">
-              Your tasks are private and only visible to you
-            </p>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              href="/register"
+              className="w-full sm:w-auto px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors shadow-lg"
+            >
+              Get Started
+            </Link>
+            <Link
+              href="/login"
+              className="w-full sm:w-auto px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-400 transition-colors border-2 border-white/20"
+            >
+              Sign In
+            </Link>
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="text-center space-x-4">
-          <Link
-            href="/register"
-            className="inline-block px-8 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
-          >
-            Get Started
-          </Link>
-          <Link
-            href="/login"
-            className="inline-block px-8 py-3 bg-white text-primary-600 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors shadow-md"
-          >
-            Sign In
-          </Link>
+        {/* Features Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          {/* Feature 1 */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Secure</h3>
+            <p className="text-sm text-blue-100">Your data is encrypted and protected</p>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Fast</h3>
+            <p className="text-sm text-blue-100">Lightning-fast performance</p>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 sm:col-span-2 lg:col-span-1">
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Responsive</h3>
+            <p className="text-sm text-blue-100">Works on all devices</p>
+          </div>
         </div>
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-sm text-gray-600">
-          <p>© 2026 Todo App. All rights reserved.</p>
-        </footer>
+        <div className="text-center text-white/70 text-sm">
+          <p>© 2026 Todo App. Built with Next.js & Tailwind CSS.</p>
+        </div>
       </div>
     </div>
   )
