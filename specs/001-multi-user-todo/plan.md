@@ -19,7 +19,7 @@ Build a full-stack multi-user Todo web application with secure authentication an
 - Frontend: Next.js 16+, Better Auth 1.x, React 19+, Tailwind CSS 4.x
 **Storage**: Neon Serverless PostgreSQL (managed database service)
 **Testing**: pytest (backend), Jest + React Testing Library (frontend), Playwright (E2E)
-**Target Platform**: Web browsers (Chrome, Firefox, Safari, Edge latest 2 versions), deployed on cloud platforms (Vercel for frontend, Render/Railway for backend)
+**Target Platform**: Web browsers (Chrome, Firefox, Safari, Edge latest 2 versions), deployed on cloud platforms (Vercel for frontend, Render for backend)
 **Project Type**: Web application (monorepo with separate frontend and backend)
 **Performance Goals**:
 - API response time <500ms (p95)

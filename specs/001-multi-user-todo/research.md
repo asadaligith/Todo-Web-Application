@@ -388,7 +388,7 @@ BETTER_AUTH_URL=http://localhost:3000
 
 ## Deployment Strategy
 
-### Backend Deployment (Render/Railway)
+### Backend Deployment (Render)
 
 - Deploy as containerized application (Dockerfile)
 - Set environment variables in platform dashboard

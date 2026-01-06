@@ -488,7 +488,7 @@ If you encounter issues not covered in this guide:
 This quickstart guide is for **local development only**. For production deployment:
 
 - Use Vercel for frontend hosting
-- Use Render or Railway for backend hosting
+- Use Render for backend hosting
 - Ensure HTTPS is enabled
 - Use strong JWT secrets (64+ characters)
 - Enable rate limiting on auth endpoints

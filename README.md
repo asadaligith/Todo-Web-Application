@@ -188,10 +188,10 @@ This application adheres to nine core principles:
 
 ## Deployment
 
-### Backend (Render/Railway/Fly.io)
+### Backend (Render)
 1. Set environment variables in platform dashboard
 2. Deploy from Git repository
-3. Run migrations: `alembic upgrade head`
+3. Set root directory to `backend`
 4. Configure health check endpoint: `/health`
 
 ### Frontend (Vercel)

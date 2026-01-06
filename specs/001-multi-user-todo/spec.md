@@ -204,7 +204,7 @@ The following features are explicitly excluded from this specification:
 
 - Serverless PostgreSQL database service (e.g., Neon, Supabase, AWS RDS Aurora Serverless)
 - Web hosting platform for frontend deployment (e.g., Vercel, Netlify)
-- Backend API hosting with support for Python/FastAPI (e.g., Render, Railway, AWS Lambda)
+- Backend API hosting with support for Python/FastAPI (e.g., Render, AWS Lambda)
 - HTTPS/TLS certificates for production deployment (typically provided by hosting platforms)
 
 ## Security & Privacy Considerations

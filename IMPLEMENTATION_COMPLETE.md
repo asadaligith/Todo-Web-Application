@@ -340,11 +340,12 @@ npm run dev
 
 ## 📦 Deployment
 
-### Backend (Railway / Render)
+### Backend (Render)
 1. Push code to GitHub
-2. Connect repository to Railway/Render
-3. Set environment variables
-4. Deploy backend service
+2. Connect repository to Render
+3. Set root directory to `backend`
+4. Set environment variables
+5. Deploy backend service
 
 ### Frontend (Vercel)
 1. Push code to GitHub

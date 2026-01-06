@@ -1,91 +1,117 @@
-# Deployment Guide - Railway + Vercel
+# Deployment Guide - Render + Vercel
 
 ## Overview
 This guide will help you deploy:
-- **Backend** → Railway (FastAPI/Python)
+- **Backend** → Render (FastAPI/Python)
 - **Frontend** → Vercel (Next.js)
+- **Database** → Neon PostgreSQL (already configured)
 
 ---
 
 ## Prerequisites
 - GitHub account
-- Railway account (https://railway.app)
+- Render account (https://render.com)
 - Vercel account (https://vercel.com)
 - Git installed locally
 
 ---
 
-## Part 1: Deploy Backend to Railway
+## Part 1: Deploy Backend to Render
 
 ### Step 1: Push to GitHub
 
 ```bash
-# Initialize git (if not already done)
+# Make sure your code is pushed to GitHub
 cd Todo-Web-Application
-git init
 git add .
-git commit -m "Initial commit - ready for deployment"
-
-# Create a new repository on GitHub, then:
-git remote add origin https://github.com/YOUR_USERNAME/todo-app.git
-git branch -M main
-git push -u origin main
+git commit -m "Prepare for deployment"
+git push origin main
 ```
 
-### Step 2: Deploy to Railway
+### Step 2: Create Render Account
 
-1. **Go to Railway**: https://railway.app
-2. **Click "New Project"**
-3. **Select "Deploy from GitHub repo"**
-4. **Choose your repository**: `todo-app`
-5. **Select the backend folder**: Configure to deploy from `/backend`
+1. **Go to**: https://render.com
+2. **Sign up** with GitHub
+3. Authorize Render to access your repositories
 
-### Step 3: Configure Environment Variables
+### Step 3: Create New Web Service
 
-In Railway dashboard, go to **Variables** and add:
+1. Click **"New +"** → **"Web Service"**
+2. **Connect your GitHub repository**: `Todo-Web-Application`
+3. If not showing up, click **"Configure account"** and grant access
+
+### Step 4: Configure Service Settings
+
+Fill in the following settings:
 
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_tajEZIPKvl07@ep-rough-dream-ahgydxk8-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+Name: todo-api-backend
+Region: Oregon (US West) or closest to your users
+Branch: main (or 001-multi-user-todo)
 
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-min-32-chars
+Root Directory: backend        ← IMPORTANT!
+Runtime: Python 3
 
-JWT_ALGORITHM=HS256
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn src.main:app --host 0.0.0.0 --port $PORT
 
-JWT_EXPIRATION_HOURS=24
-
-API_V1_PREFIX=/api/v1
-
-CORS_ORIGINS=https://your-frontend-domain.vercel.app
-
-HOST=0.0.0.0
-
-PORT=$PORT
+Instance Type: Free
 ```
 
-⚠️ **Important**: Update `CORS_ORIGINS` after deploying frontend!
+### Step 5: Configure Environment Variables
 
-### Step 4: Configure Build Settings
+Click **"Advanced"** and add these environment variables:
 
-Railway should auto-detect the settings from `railway.json`, but verify:
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
-- **Root Directory**: `/backend`
+```env
+DATABASE_URL
+postgresql://neondb_owner:npg_tajEZIPKvl07@ep-rough-dream-ahgydxk8-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
 
-### Step 5: Deploy
+JWT_SECRET
+<your-generated-secret-32-chars>
 
-Click **Deploy** and wait for deployment to complete.
+JWT_ALGORITHM
+HS256
 
-### Step 6: Get Backend URL
+JWT_EXPIRATION_HOURS
+24
 
-Once deployed, Railway will provide a URL like:
+API_V1_PREFIX
+/api/v1
+
+CORS_ORIGINS
+http://localhost:3000
+
+HOST
+0.0.0.0
 ```
-https://your-app-name.up.railway.app
+
+⚠️ **Important**: Generate a strong `JWT_SECRET` for production:
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
-Test it:
-```
-https://your-app-name.up.railway.app/health
-https://your-app-name.up.railway.app/docs
+### Step 6: Deploy
+
+1. Click **"Create Web Service"**
+2. Wait for deployment to complete (2-5 minutes)
+3. Render will provide a URL like: `https://todo-api-backend.onrender.com`
+
+### Step 7: Verify Backend Deployment
+
+Test your backend endpoints:
+
+```bash
+# Health check
+curl https://your-backend-url.onrender.com/health
+
+# Should return:
+{"status":"healthy","service":"todo-api"}
+
+# API info
+curl https://your-backend-url.onrender.com/
+
+# Should return:
+{"message":"Todo API","version":"1.0.0","docs":"/docs","health":"/health"}
 ```
 
 ---
@@ -95,130 +121,110 @@ https://your-app-name.up.railway.app/docs
 ### Step 1: Go to Vercel
 
 1. **Visit**: https://vercel.com
-2. **Click "New Project"**
-3. **Import your GitHub repository**: `todo-app`
+2. **Sign in** with GitHub
 
-### Step 2: Configure Project
+### Step 2: Import Project
 
-- **Framework Preset**: Next.js
-- **Root Directory**: `frontend`
-- **Build Command**: `npm run build` (auto-detected)
-- **Output Directory**: `.next` (auto-detected)
-- **Install Command**: `npm install` (auto-detected)
+1. Click **"Add New..."** → **"Project"**
+2. **Import your GitHub repository**: `Todo-Web-Application`
 
-### Step 3: Configure Environment Variables
-
-Add the following environment variable:
+### Step 3: Configure Project Settings
 
 ```
-NEXT_PUBLIC_API_URL=https://your-app-name.up.railway.app
+Framework Preset: Next.js
+Root Directory: frontend
+Build Command: npm run build (auto-detected)
+Output Directory: .next (auto-detected)
+Install Command: npm install (auto-detected)
 ```
 
-Replace with your actual Railway backend URL.
+### Step 4: Configure Environment Variables
 
-### Step 4: Deploy
+Add the following environment variables:
 
-Click **Deploy** and wait for deployment to complete.
+```env
+NEXT_PUBLIC_API_URL
+https://your-backend-url.onrender.com
 
-### Step 5: Get Frontend URL
+BETTER_AUTH_SECRET
+<same-secret-as-backend-jwt-secret>
 
-Vercel will provide a URL like:
-```
+BETTER_AUTH_URL
 https://your-app-name.vercel.app
 ```
 
+⚠️ **Important**:
+- `BETTER_AUTH_SECRET` MUST match the `JWT_SECRET` from backend
+- `BETTER_AUTH_URL` will be your Vercel URL (you can update this after first deployment)
+
+### Step 5: Deploy
+
+1. Click **"Deploy"**
+2. Wait for deployment to complete (2-3 minutes)
+3. Vercel will provide a URL like: `https://your-app-name.vercel.app`
+
+### Step 6: Update BETTER_AUTH_URL
+
+1. After first deployment, copy your Vercel URL
+2. Go to Vercel dashboard → **Settings** → **Environment Variables**
+3. Update `BETTER_AUTH_URL` with your actual Vercel URL
+4. **Redeploy** the frontend
+
 ---
 
-## Part 3: Update CORS Configuration
+## Part 3: Update Backend CORS Configuration
 
 ### Important: Update Backend CORS
 
-1. Go back to **Railway dashboard**
-2. Update the `CORS_ORIGINS` variable:
+Now that you have your frontend URL, update the backend CORS settings:
+
+1. Go back to **Render dashboard**
+2. Select your **backend service**
+3. Go to **Environment** tab
+4. Update the `CORS_ORIGINS` variable:
    ```
    CORS_ORIGINS=https://your-app-name.vercel.app
    ```
-3. Railway will automatically redeploy
+5. Render will automatically redeploy
 
 ---
 
-## Part 4: Initialize Database (One-time)
+## Part 4: Test Production Deployment
 
-After backend is deployed, you need to create the database tables:
+### Complete Testing Checklist
 
-### Option A: Using Railway CLI
-
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login to Railway
-railway login
-
-# Link to your project
-railway link
-
-# Run the table creation script
-railway run python create_tables.py
-```
-
-### Option B: Using Local Script
-
-```bash
-# Update backend/.env with production DATABASE_URL
-# Then run locally:
-cd backend
-python create_tables.py
-```
-
----
-
-## Part 5: Test Production Deployment
-
-1. **Visit your frontend**: `https://your-app-name.vercel.app`
-2. **Register a new account**
-3. **Login**
-4. **Create, edit, and delete tasks**
-5. **Verify everything works!**
-
----
-
-## Verification Checklist
-
-- [ ] Backend health check returns 200: `/health`
-- [ ] API docs are accessible: `/docs`
-- [ ] Database tables created (users, tasks)
-- [ ] Frontend loads without errors
-- [ ] User registration works
-- [ ] User login works
-- [ ] Task creation works
-- [ ] Task editing works
-- [ ] Task completion toggle works
-- [ ] Task deletion works
-- [ ] Toast notifications appear
-- [ ] Responsive design works on mobile
+1. ✅ **Visit your frontend**: `https://your-app-name.vercel.app`
+2. ✅ **Register a new account**
+3. ✅ **Login with your account**
+4. ✅ **Create a new task**
+5. ✅ **Edit a task**
+6. ✅ **Mark task as complete**
+7. ✅ **Delete a task**
+8. ✅ **Test on mobile device** (responsive design)
+9. ✅ **Check browser console** (no CORS errors)
 
 ---
 
 ## Environment Variables Summary
 
-### Railway (Backend)
+### Render (Backend)
 
 ```env
-DATABASE_URL=<your-neon-postgres-url>
+DATABASE_URL=<your-neon-postgres-connection-string>
 JWT_SECRET=<your-secret-key-min-32-chars>
 JWT_ALGORITHM=HS256
 JWT_EXPIRATION_HOURS=24
 API_V1_PREFIX=/api/v1
 CORS_ORIGINS=<your-vercel-frontend-url>
 HOST=0.0.0.0
-PORT=$PORT
 ```
 
 ### Vercel (Frontend)
 
 ```env
-NEXT_PUBLIC_API_URL=<your-railway-backend-url>
+NEXT_PUBLIC_API_URL=<your-render-backend-url>
+BETTER_AUTH_SECRET=<same-as-backend-jwt-secret>
+BETTER_AUTH_URL=<your-vercel-frontend-url>
 ```
 
 ---
@@ -228,82 +234,171 @@ NEXT_PUBLIC_API_URL=<your-railway-backend-url>
 ### Backend Issues
 
 **500 Internal Server Error**
-- Check Railway logs
-- Verify DATABASE_URL is correct
-- Ensure tables are created
+- Check Render logs: Dashboard → Logs tab
+- Verify `DATABASE_URL` is correct
+- Ensure database tables are created (should auto-create on first user registration)
 
-**CORS Errors**
-- Update CORS_ORIGINS in Railway
-- Must include full URL with https://
+**CORS Errors in Browser**
+- Update `CORS_ORIGINS` in Render dashboard
+- Must include full URL with `https://`
 - No trailing slash
+- Redeploy backend after updating
 
 **Database Connection Failed**
-- Check Neon database is active
-- Verify connection string includes SSL settings
+- Check Neon database is active (free tier doesn't auto-sleep)
+- Verify connection string includes `?sslmode=require`
+- Test connection from Render shell (if available)
+
+**Build Failed on Render**
+- Check `Root Directory` is set to `backend`
+- Verify `requirements.txt` exists in backend folder
+- Check build logs for missing dependencies
 
 ### Frontend Issues
 
 **API calls failing**
-- Verify NEXT_PUBLIC_API_URL is set correctly
+- Verify `NEXT_PUBLIC_API_URL` is set correctly in Vercel
 - Check backend is deployed and running
-- Test backend health endpoint
+- Test backend health endpoint directly
+- Check browser console for exact error
 
-**Build Failed**
-- Check for TypeScript errors
-- Verify all dependencies are in package.json
+**Build Failed on Vercel**
+- Check for TypeScript errors locally: `npm run build`
+- Verify all dependencies are in `package.json`
 - Check build logs in Vercel dashboard
+- Ensure `Root Directory` is set to `frontend`
 
 **Environment variables not working**
 - Redeploy after adding variables
-- Environment variables must start with NEXT_PUBLIC_ to be available in browser
+- Environment variables starting with `NEXT_PUBLIC_` are exposed to browser
+- Other env vars are only available at build time
+
+**CORS errors after deployment**
+- Verify backend `CORS_ORIGINS` matches your Vercel URL exactly
+- Check for `http://` vs `https://` mismatch
+- No trailing slashes in URLs
+
+---
+
+## Render Free Tier Information
+
+### What You Get (Free Tier)
+
+- **750 hours per month** of runtime
+- **Automatic HTTPS** with SSL certificates
+- **Auto-deploy** on git push
+- **Environment variables** support
+- **Log streaming**
+
+### Important Limitations
+
+⚠️ **Free tier services spin down after 15 minutes of inactivity**
+
+What this means:
+- First request after inactivity takes ~30 seconds (cold start)
+- Subsequent requests are fast
+- Perfect for demos and personal projects
+- Consider upgrading to **Starter ($7/month)** for always-on service
+
+### To Keep Backend Always Running
+
+Upgrade to Render Starter plan:
+1. Go to Render dashboard
+2. Select your service
+3. Click **"Upgrade"**
+4. Choose **Starter** plan ($7/month)
 
 ---
 
 ## Continuous Deployment
 
-Both Railway and Vercel support automatic deployments:
+Both Render and Vercel support automatic deployments:
 
+### Render
 - **Push to main branch** → Automatic deployment
-- **Pull requests** → Preview deployments (Vercel)
-- **Rollback** → Available in both platforms
+- **Manual deploy** → Click "Manual Deploy" in dashboard
+- **Rollback** → Deploy previous commit from dashboard
+
+### Vercel
+- **Push to main branch** → Automatic production deployment
+- **Pull requests** → Automatic preview deployments
+- **Rollback** → Click "Rollback" on any previous deployment
 
 ---
 
-## Monitoring
+## Monitoring & Logs
 
-### Railway
-- View logs in Railway dashboard
-- Monitor resource usage
-- Set up alerts
+### Render Dashboard
 
-### Vercel
-- View deployment logs
-- Monitor performance
-- View analytics
+- **Logs**: Real-time log streaming
+- **Metrics**: CPU, memory usage
+- **Events**: Deployment history
+- **Shell**: Access to container shell (paid plans)
+
+### Vercel Dashboard
+
+- **Deployments**: View all deployments
+- **Runtime Logs**: Function execution logs
+- **Analytics**: Page views, performance (paid feature)
+- **Speed Insights**: Core Web Vitals
 
 ---
 
 ## Custom Domains (Optional)
 
-### Railway
-1. Go to Settings → Domains
-2. Add your custom domain
-3. Update DNS records
+### Add Custom Domain to Render
 
-### Vercel
-1. Go to Project Settings → Domains
-2. Add your custom domain
-3. Vercel will provide DNS configuration
+1. Go to Render dashboard → **Settings** → **Custom Domain**
+2. Add your domain (e.g., `api.yourdomain.com`)
+3. Update DNS records with your domain provider:
+   ```
+   CNAME api.yourdomain.com → your-app.onrender.com
+   ```
+4. Render automatically provisions SSL certificate
+
+### Add Custom Domain to Vercel
+
+1. Go to Vercel dashboard → **Settings** → **Domains**
+2. Add your domain (e.g., `yourdomain.com`)
+3. Vercel provides DNS configuration:
+   ```
+   A     @    76.76.21.21
+   CNAME www  cname.vercel-dns.com
+   ```
+4. Update DNS with your domain provider
+5. SSL is automatically configured
 
 ---
 
 ## Security Recommendations
 
-1. **Change JWT_SECRET** to a strong random string (min 32 characters)
-2. **Use HTTPS** everywhere (automatic with Railway and Vercel)
-3. **Rotate secrets** periodically
-4. **Monitor logs** for suspicious activity
-5. **Keep dependencies updated**: `npm audit` and `pip check`
+### Essential Security Steps
+
+1. ✅ **Change JWT_SECRET** to a strong random string (min 32 characters)
+2. ✅ **Use HTTPS** everywhere (automatic with Render and Vercel)
+3. ✅ **Rotate secrets** periodically (every 90 days recommended)
+4. ✅ **Monitor logs** for suspicious activity
+5. ✅ **Keep dependencies updated**:
+   ```bash
+   # Backend
+   pip list --outdated
+   pip install --upgrade <package>
+
+   # Frontend
+   npm audit
+   npm update
+   ```
+
+### Production Checklist
+
+- [ ] Strong, unique JWT_SECRET generated
+- [ ] CORS configured with exact frontend URL
+- [ ] Database connection string uses SSL (`?sslmode=require`)
+- [ ] No secrets committed to Git
+- [ ] Environment variables set in deployment platforms (not in code)
+- [ ] HTTPS enabled (automatic)
+- [ ] Error logging configured
+- [ ] Database backups enabled (Neon automatic backups)
 
 ---
 
@@ -311,39 +406,173 @@ Both Railway and Vercel support automatic deployments:
 
 ### Free Tier Limits
 
-**Railway** (Hobby Plan):
-- $5 credit/month
-- Enough for small apps
-- Upgrade for more resources
+**Render (Free Tier)**:
+- ✅ 750 hours per month (enough for one always-on app)
+- ✅ Automatic SSL
+- ✅ Deploy from GitHub
+- ⚠️ Services sleep after 15 min inactivity
+- **Upgrade**: $7/month for always-on
 
-**Vercel** (Hobby Plan):
-- Unlimited deployments
-- 100 GB bandwidth
-- Perfect for this project
+**Vercel (Hobby Plan - Free)**:
+- ✅ Unlimited deployments
+- ✅ 100 GB bandwidth per month
+- ✅ Automatic SSL
+- ✅ Perfect for this project
+- **Upgrade**: $20/month for Pro features
 
-**Neon** (Free Tier):
-- 0.5 GB storage
-- Good for development/small apps
+**Neon (Free Tier)**:
+- ✅ 0.5 GB storage
+- ✅ 1 project
+- ✅ Automatic backups
+- ✅ Good for development and small apps
+- **Upgrade**: $19/month for more storage
 
----
-
-## Support
-
-If you encounter issues:
-1. Check Railway logs: `railway logs`
-2. Check Vercel logs in dashboard
-3. Test backend API directly
-4. Verify environment variables
-5. Check database connection
+**Total Monthly Cost: $0** (with free tiers)
 
 ---
 
-**🎉 Deployment Complete!**
+## Scaling Considerations
 
-Your Todo application is now live and accessible worldwide!
+### When to Upgrade
 
-- **Backend**: https://your-app.up.railway.app
-- **Frontend**: https://your-app.vercel.app
-- **API Docs**: https://your-app.up.railway.app/docs
+**Backend (Render)**:
+- Upgrade when you need always-on service (no cold starts)
+- Or when you exceed 750 hours/month
+- **Starter**: $7/month - always-on, 512MB RAM
+- **Standard**: $25/month - 2GB RAM, more CPU
 
-**Share your app and start managing tasks! 🚀**
+**Frontend (Vercel)**:
+- Free tier is usually sufficient
+- Upgrade for team features, analytics, or high traffic
+- **Pro**: $20/month per user
+
+**Database (Neon)**:
+- Upgrade when you exceed 0.5 GB storage
+- Or need more than 1 project
+- **Launch**: $19/month - 10 GB storage
+
+---
+
+## Support Resources
+
+### Documentation
+- **Render Docs**: https://render.com/docs
+- **Vercel Docs**: https://vercel.com/docs
+- **FastAPI Deployment**: https://fastapi.tiangolo.com/deployment/
+- **Next.js Deployment**: https://nextjs.org/docs/deployment
+
+### Getting Help
+- **Render Community**: https://community.render.com
+- **Vercel Discord**: https://vercel.com/discord
+- **FastAPI Discord**: https://discord.gg/fastapi
+- **Next.js Discussions**: https://github.com/vercel/next.js/discussions
+
+---
+
+## Migration from Local to Production
+
+### Database Migration
+
+Your Neon database is already configured for production. No migration needed since you're using the same database for both development and production.
+
+**Best Practice** (for future):
+1. Create separate database for production
+2. Use Neon branching feature for staging/dev databases
+3. Never use production database for local development
+
+### Environment-Specific Configs
+
+Current setup uses single database. For better separation:
+
+**Local Development**:
+```env
+DATABASE_URL=<neon-dev-branch>
+JWT_SECRET=dev-secret-not-secure
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+```
+
+**Production (Render)**:
+```env
+DATABASE_URL=<neon-main-branch>
+JWT_SECRET=<strong-generated-secret>
+CORS_ORIGINS=https://your-app.vercel.app
+```
+
+---
+
+## Post-Deployment Maintenance
+
+### Regular Tasks
+
+**Weekly**:
+- Check Render logs for errors
+- Monitor Vercel analytics (if enabled)
+- Review Neon database size
+
+**Monthly**:
+- Update dependencies
+- Review security advisories
+- Check for new features in Render/Vercel
+- Rotate secrets (recommended every 90 days)
+
+**As Needed**:
+- Scale up if hitting free tier limits
+- Add custom domain
+- Configure monitoring/alerts
+- Set up error tracking (Sentry, etc.)
+
+---
+
+## Backup & Recovery
+
+### Database Backups
+
+**Neon PostgreSQL**:
+- ✅ Automatic backups on free tier
+- ✅ Point-in-time recovery
+- ✅ 7-day retention
+
+To restore:
+1. Go to Neon dashboard
+2. Select your database
+3. Go to **Backups** tab
+4. Click **Restore** on desired backup point
+
+### Application Recovery
+
+**Render**:
+- Redeploy previous commit from dashboard
+- Or deploy from specific Git commit
+
+**Vercel**:
+- Click **Rollback** on any previous deployment
+- Instant rollback to last working version
+
+---
+
+## Conclusion
+
+**🎉 Your Todo application is now deployed to production!**
+
+**Live URLs**:
+- **Backend API**: https://your-backend.onrender.com
+- **Frontend App**: https://your-app.vercel.app
+- **API Docs**: https://your-backend.onrender.com/docs
+
+**Next Steps**:
+1. Share your app with users
+2. Monitor logs and performance
+3. Consider adding features:
+   - Email notifications
+   - Task reminders
+   - Categories/tags
+   - Collaboration features
+4. Set up analytics
+5. Configure custom domain
+
+**Questions or Issues?**
+- Check the troubleshooting section above
+- Review platform documentation
+- Check GitHub repository issues
+
+**Happy deploying! 🚀**
